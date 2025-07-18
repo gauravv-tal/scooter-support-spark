@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Zap } from "lucide-react";
 import scooterLogo from "@/assets/scooter-logo.png";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { signInWithPhone, verifyOtp, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleSendOtp = async () => {
     if (!phoneNumber || phoneNumber.length < 10) {
@@ -17,11 +27,16 @@ const LoginPage = () => {
     }
     
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setShowOtp(true);
+    try {
+      const { error } = await signInWithPhone(phoneNumber);
+      if (!error) {
+        setShowOtp(true);
+      }
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleVerifyOtp = async () => {
@@ -30,11 +45,16 @@ const LoginPage = () => {
     }
     
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const { error } = await verifyOtp(phoneNumber, otp);
+      if (!error) {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error("Failed to verify OTP:", error);
+    } finally {
       setIsLoading(false);
-      console.log("Login successful");
-    }, 1500);
+    }
   };
 
   return (
