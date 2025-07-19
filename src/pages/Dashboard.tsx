@@ -6,6 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon } from 'lucide-react';
 import gangesLogo from "@/assets/ganges-logo.png";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -18,8 +26,11 @@ const Dashboard = () => {
   }, [user, loading, navigate]);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    try {
+      await signOut();
+    } finally {
+      navigate('/');
+    }
   };
 
   if (loading) {
@@ -50,14 +61,32 @@ const Dashboard = () => {
           <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
           <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
         </div>
-        <Button
-          variant="ghost"
-          onClick={handleSignOut}
-          className="text-white hover:bg-white/20"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
-        </Button>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#" onClick={() => navigate('/add-questions')}>Add Questions</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#" onClick={() => navigate('/support-queries')}>Support Queries</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#" onClick={() => navigate('/chat-history')}>Chat History</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <button
+                  className="flex items-center text-white hover:text-red-500 focus:outline-none bg-transparent border-none p-0 m-0"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />Sign Out
+                </button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       {/* Welcome Section */}
