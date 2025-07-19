@@ -8,13 +8,13 @@ import { supabase } from '@/integrations/supabase/client';
 import gangesLogo from "@/assets/ganges-logo.png";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { Menu } from 'lucide-react';
 import scooterModelsBg from "@/assets/scooter-models-bg.jpg";
 
 const Dashboard = () => {
@@ -81,32 +81,23 @@ const Dashboard = () => {
           <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
           <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
         </div>
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#" onClick={() => navigate('/add-questions')}>Add Questions</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#" onClick={() => navigate('/support-queries')}>Support Queries</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#" onClick={() => navigate('/chat-history')}>Chat History</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button
-                  className="flex items-center text-white hover:text-red-500 focus:outline-none bg-transparent border-none p-0 m-0"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />Sign Out
-                </button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-2 rounded-md text-white hover:bg-white/10 focus:outline-none">
+              <Menu className="w-7 h-7" />
+              <span className="sr-only">Open menu</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/support-queries')}>Support Queries</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/chat-history')}>Chat History</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700">
+              <LogOut className="w-4 h-4 mr-2" />Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Welcome Section */}
