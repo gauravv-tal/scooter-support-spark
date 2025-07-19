@@ -10,6 +10,7 @@ import { ArrowLeft, Send, Paperclip, ThumbsDown, MessageSquare, Upload } from 'l
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface Message {
   id: string;
@@ -271,7 +272,7 @@ const Chat = () => {
     <div 
       className="min-h-screen flex flex-col relative"
       style={{
-        backgroundImage: `url(${require("@/assets/dashboard-bg.jpg")}`,
+        backgroundImage: `url(${dashboardBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
