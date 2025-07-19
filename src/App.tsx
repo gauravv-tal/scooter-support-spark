@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import Orders from "./pages/Orders";
 import ChatHistory from "./pages/ChatHistory";
 import SupportQueries from "./pages/SupportQueries";
+import AddQuestions from "./pages/AddQuestions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/orders" element={<Orders />} />
             <Route path="/chat-history" element={<ChatHistory />} />
             <Route path="/support-queries" element={<SupportQueries />} />
+            <Route path="/add-questions" element={<AddQuestions />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
