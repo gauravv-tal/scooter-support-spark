@@ -237,7 +237,10 @@ const Chat = () => {
         .insert({
           user_id: user.id,
           conversation_id: currentConversationId,
-          query_text: messageContent
+          query_text: messageContent,
+          admin_response: "Thanks for submitting your questions, support team soon will respond on it",
+          response_date: new Date().toISOString(),
+          status: 'responded'
         });
 
       if (error) throw error;

@@ -75,28 +75,37 @@ export type Database = {
       }
       customer_queries: {
         Row: {
+          admin_response: string | null
           conversation_id: string | null
           created_at: string
           id: string
           query_text: string
+          responded_by: string | null
+          response_date: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          admin_response?: string | null
           conversation_id?: string | null
           created_at?: string
           id?: string
           query_text: string
+          responded_by?: string | null
+          response_date?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          admin_response?: string | null
           conversation_id?: string | null
           created_at?: string
           id?: string
           query_text?: string
+          responded_by?: string | null
+          response_date?: string | null
           status?: string
           updated_at?: string
           user_id?: string
