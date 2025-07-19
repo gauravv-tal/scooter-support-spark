@@ -120,6 +120,42 @@ export type Database = {
           },
         ]
       }
+      kb_articles: {
+        Row: {
+          category: string | null
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          product_model: string | null
+          specifications: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          product_model?: string | null
+          specifications?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          product_model?: string | null
+          specifications?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       predefined_questions: {
         Row: {
           answer: string

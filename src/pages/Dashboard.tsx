@@ -7,6 +7,7 @@ import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon, Settings
 import { supabase } from '@/integrations/supabase/client';
 import gangesLogo from "@/assets/ganges-logo.png";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
+import scooterModelsBg from "@/assets/scooter-models-bg.jpg";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -56,10 +57,11 @@ const Dashboard = () => {
     <div 
       className="min-h-screen p-4 relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${dashboardBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${scooterModelsBg}), url(${dashboardBg})`,
+        backgroundSize: 'cover, cover',
+        backgroundPosition: 'center, center',
+        backgroundAttachment: 'fixed',
+        backgroundBlendMode: 'overlay'
       }}
     >
       {/* Header */}
