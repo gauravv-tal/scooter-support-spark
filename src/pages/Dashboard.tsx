@@ -3,19 +3,37 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon } from 'lucide-react';
+import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon, Settings } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import gangesLogo from "@/assets/ganges-logo.png";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/');
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("user_id", user.id)
+          .single();
+        
+        setUserRole(profile?.role || 'customer');
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -183,6 +201,36 @@ const Dashboard = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Admin Only Card */}
+        {userRole === 'admin' && (
+          <Card 
+            className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer border-2 border-yellow-400/50"
+            onClick={() => navigate('/add-questions')}
+          >
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Add Questions
+                <span className="text-xs bg-yellow-600/30 text-yellow-200 px-2 py-1 rounded">Admin</span>
+              </CardTitle>
+              <CardDescription className="text-white/80">
+                Manage predefined questions and answers for customer support
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/add-questions');
+                }}
+              >
+                Manage Questions
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
