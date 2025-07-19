@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Send, Paperclip, ThumbsDown, MessageSquare, Upload } from 'lucide-react';
+import { ArrowLeft, Send, Paperclip, ThumbsDown, MessageSquare, Upload, File, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import gangesLogo from "@/assets/ganges-logo.png";
@@ -42,6 +42,7 @@ const Chat = () => {
   const [predefinedQuestions, setPredefinedQuestions] = useState<PredefinedQuestion[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -143,6 +144,123 @@ const Chat = () => {
     }
     
     return null;
+  };
+
+  const validateFile = (file: File): string | null => {
+    // Check file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      return "File size must be less than 2MB";
+    }
+
+    // Check file type
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg', 
+      'image/png',
+      'application/pdf'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      return "Only JPEG, PNG, and PDF files are allowed";
+    }
+
+    return null;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentConversationId || !user) return;
+
+    // Validate file
+    const validationError = validateFile(file);
+    if (validationError) {
+      toast({
+        title: "Invalid File",
+        description: validationError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingFile(true);
+
+    try {
+      // Create unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      // Upload file to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('chat-files')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL for the uploaded file
+      const { data: urlData } = supabase.storage
+        .from('chat-files')
+        .getPublicUrl(fileName);
+
+      // Send message with file
+      const { error: messageError } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: currentConversationId,
+          content: `Shared a file: ${file.name}`,
+          is_user_message: true,
+          file_url: urlData.publicUrl
+        });
+
+      if (messageError) throw messageError;
+
+      // Clear file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // Reload messages
+      loadMessages();
+
+      toast({
+        title: "File Uploaded",
+        description: "Your file has been shared successfully.",
+      });
+
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload Error",
+        description: "Failed to upload file. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleDownloadFile = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Download Error",
+        description: "Failed to download file. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSendMessage = async () => {
@@ -424,21 +542,47 @@ const Chat = () => {
                           ? 'bg-neon-cyan text-electric-dark'
                           : 'bg-white/10 text-white backdrop-blur-sm'
                       }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
-                      {!message.is_user_message && (
-                        <div className="mt-2 flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-white/70 hover:text-white hover:bg-white/20 h-6 px-2"
-                            onClick={() => handleNotSatisfied(message.content)}
-                          >
-                            <ThumbsDown className="w-3 h-3 mr-1" />
-                            Not helpful?
-                          </Button>
-                        </div>
-                      )}
+                     >
+                       <p className="text-sm">{message.content}</p>
+                       
+                       {/* File attachment display */}
+                       {message.file_url && (
+                         <div className="mt-2 p-2 bg-black/20 rounded border border-white/20">
+                           <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-2">
+                               <File className="w-4 h-4" />
+                               <span className="text-xs">
+                                 {message.content.replace('Shared a file: ', '')}
+                               </span>
+                             </div>
+                             <Button
+                               size="sm"
+                               variant="ghost"
+                               className="h-6 px-2 text-white/70 hover:text-white hover:bg-white/20"
+                               onClick={() => handleDownloadFile(
+                                 message.file_url!, 
+                                 message.content.replace('Shared a file: ', '')
+                               )}
+                             >
+                               <Download className="w-3 h-3" />
+                             </Button>
+                           </div>
+                         </div>
+                       )}
+                       
+                       {!message.is_user_message && (
+                         <div className="mt-2 flex gap-2">
+                           <Button
+                             size="sm"
+                             variant="ghost"
+                             className="text-white/70 hover:text-white hover:bg-white/20 h-6 px-2"
+                             onClick={() => handleNotSatisfied(message.content)}
+                           >
+                             <ThumbsDown className="w-3 h-3 mr-1" />
+                             Not helpful?
+                           </Button>
+                         </div>
+                       )}
                     </div>
                   </div>
                 ))
@@ -452,15 +596,17 @@ const Chat = () => {
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
-                accept="image/*,.pdf,.doc,.docx"
+                accept=".jpeg,.jpg,.png,.pdf"
+                onChange={handleFileUpload}
               />
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-white hover:bg-white/20 border border-white/20"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile || isLoading}
               >
-                <Paperclip className="w-4 h-4" />
+                {uploadingFile ? <Upload className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
               </Button>
               <Input
                 value={inputMessage}
