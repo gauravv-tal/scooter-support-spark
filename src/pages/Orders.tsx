@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import scooterLogo from "@/assets/scooter-logo.png";
+import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface Order {
   id: string;
@@ -106,20 +107,30 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-electric-light to-electric-dark">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/dashboard')}
-          className="text-white hover:bg-white/20"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <img src={scooterLogo} alt="EcoRide" className="w-8 h-8" />
-        <h1 className="text-xl font-bold text-white">My Orders</h1>
-      </div>
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="relative z-10 min-h-screen">
+        {/* Header */}
+        <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/dashboard')}
+            className="text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-12 h-7 object-contain rounded" />
+          <h1 className="text-xl font-bold text-white">My Orders</h1>
+        </div>
 
       {/* Orders List */}
       <div className="p-4 max-w-4xl mx-auto">
@@ -193,6 +204,7 @@ const Orders = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

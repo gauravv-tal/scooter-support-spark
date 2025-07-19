@@ -9,7 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Send, Paperclip, ThumbsDown, MessageSquare, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import scooterLogo from "@/assets/scooter-logo.png";
+import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface Message {
   id: string;
@@ -115,6 +116,10 @@ const Chat = () => {
 
       if (error) throw error;
       setCurrentConversationId(data.id);
+      // Load existing messages for this conversation
+      if (data.id) {
+        loadMessages();
+      }
     } catch (error) {
       console.error('Error creating conversation:', error);
     }
@@ -205,8 +210,50 @@ const Chat = () => {
     }
   };
 
-  const handleQuestionClick = (question: string) => {
-    setInputMessage(question);
+  const handleQuestionClick = async (question: string) => {
+    if (!currentConversationId || !user) return;
+
+    setIsLoading(true);
+
+    try {
+      // Add user message (the question)
+      const { error: userMsgError } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: currentConversationId,
+          content: question,
+          is_user_message: true
+        });
+
+      if (userMsgError) throw userMsgError;
+
+      // Find AI response
+      const response = findBestAnswer(question) || 
+        "I'm sorry, I couldn't find a specific answer to your question. Would you like me to escalate this to our support team?";
+
+      // Add AI response
+      const { error: aiMsgError } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: currentConversationId,
+          content: response,
+          is_user_message: false
+        });
+
+      if (aiMsgError) throw aiMsgError;
+
+      // Reload messages
+      loadMessages();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNotSatisfied = async (messageContent: string) => {
@@ -218,7 +265,10 @@ const Chat = () => {
         .insert({
           user_id: user.id,
           conversation_id: currentConversationId,
-          query_text: messageContent
+          query_text: messageContent,
+          admin_response: "Thanks for submitting your questions, support team soon will respond on it",
+          response_date: new Date().toISOString(),
+          status: 'responded'
         });
 
       if (error) throw error;
@@ -270,9 +320,19 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-electric-light to-electric-dark flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="relative z-10 min-h-screen flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
@@ -281,8 +341,8 @@ const Chat = () => {
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <img src={scooterLogo} alt="EcoRide" className="w-8 h-8" />
-        <h1 className="text-xl font-bold text-white">Support Chat</h1>
+        <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-12 h-7 object-contain rounded" />
+        <h1 className="text-xl font-bold text-white">Ganges Support Chat</h1>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
@@ -330,7 +390,7 @@ const Chat = () => {
                       </Badge>
                       <Button
                         variant="ghost"
-                        className="w-full text-left text-white/90 hover:bg-white/20 h-auto p-2 text-sm"
+                        className="w-full text-left text-white hover:bg-white/20 h-auto p-3 text-sm font-medium whitespace-normal justify-start"
                         onClick={() => handleQuestionClick(qa.question)}
                       >
                         {qa.question}
@@ -397,7 +457,7 @@ const Chat = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 border border-white/20"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Paperclip className="w-4 h-4" />
@@ -405,21 +465,22 @@ const Chat = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask a question about your scooter..."
-                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                placeholder="Ask a question about your Ganges scooter..."
+                className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50"
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                 disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90"
+                className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90 font-medium px-6"
               >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

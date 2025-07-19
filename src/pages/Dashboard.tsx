@@ -3,8 +3,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, Package, LogOut, User } from 'lucide-react';
-import scooterLogo from "@/assets/scooter-logo.png";
+import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon } from 'lucide-react';
+import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -34,12 +35,20 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-electric-light to-electric-dark p-4">
+    <div 
+      className="min-h-screen p-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
-          <img src={scooterLogo} alt="EcoRide" className="w-10 h-10" />
-          <h1 className="text-2xl font-bold text-white">EcoRide Support</h1>
+          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
+          <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
         </div>
         <Button
           variant="ghost"
@@ -67,7 +76,7 @@ const Dashboard = () => {
       </div>
 
       {/* Action Cards */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         <Card 
           className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
           onClick={() => navigate('/chat')}
@@ -117,6 +126,60 @@ const Dashboard = () => {
               }}
             >
               View Orders
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
+          onClick={() => navigate('/chat-history')}
+        >
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <History className="w-5 h-5" />
+              Chat History
+            </CardTitle>
+            <CardDescription className="text-white/80">
+              View your previous conversations and support interactions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant="outline" 
+              className="w-full border-white/30 text-white hover:bg-white/20"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/chat-history');
+              }}
+            >
+              View History
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
+          onClick={() => navigate('/support-queries')}
+        >
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <HeadphonesIcon className="w-5 h-5" />
+              Support Queries
+            </CardTitle>
+            <CardDescription className="text-white/80">
+              View submitted queries and responses from our support team
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant="outline" 
+              className="w-full border-white/30 text-white hover:bg-white/20"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/support-queries');
+              }}
+            >
+              View Queries
             </Button>
           </CardContent>
         </Card>
