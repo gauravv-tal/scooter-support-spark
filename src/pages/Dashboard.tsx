@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import gangesLogo from "@/assets/ganges-logo.png";
+import { generateDemoOrdersForExistingUser } from "@/utils/generateDemoForExisting";
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 import {
   DropdownMenu,
@@ -92,6 +93,7 @@ const Dashboard = () => {
             <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('/support-queries')}>Support Queries</DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('/chat-history')}>Chat History</DropdownMenuItem>
+            <DropdownMenuItem onClick={generateDemoOrdersForExistingUser}>Generate Demo Orders</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700">
               <LogOut className="w-4 h-4 mr-2" />Sign Out
