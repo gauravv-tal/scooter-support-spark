@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ArrowLeft, Send, Paperclip, ThumbsDown, MessageSquare, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import scooterLogo from "@/assets/scooter-logo.png";
+import gangesLogo from "@/assets/ganges-logo.png";
 
 interface Message {
   id: string;
@@ -237,8 +237,8 @@ const Chat = () => {
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <img src={scooterLogo} alt="EcoRide" className="w-8 h-8" />
-        <h1 className="text-xl font-bold text-white">Support Chat</h1>
+        <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-12 h-7 object-contain rounded" />
+        <h1 className="text-xl font-bold text-white">Ganges Support Chat</h1>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
@@ -258,7 +258,7 @@ const Chat = () => {
                       </Badge>
                       <Button
                         variant="ghost"
-                        className="w-full text-left text-white/90 hover:bg-white/20 h-auto p-2 text-sm"
+                        className="w-full text-left text-white hover:bg-white/20 h-auto p-3 text-sm font-medium whitespace-normal justify-start"
                         onClick={() => handleQuestionClick(qa.question)}
                       >
                         {qa.question}
@@ -327,7 +327,7 @@ const Chat = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 border border-white/20"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Paperclip className="w-4 h-4" />
@@ -335,15 +335,15 @@ const Chat = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask a question about your scooter..."
-                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                placeholder="Ask a question about your Ganges scooter..."
+                className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50"
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                 disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90"
+                className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90 font-medium px-6"
               >
                 <Send className="w-4 h-4" />
               </Button>

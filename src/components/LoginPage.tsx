@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Zap } from "lucide-react";
-import scooterLogo from "@/assets/scooter-logo.png";
+import gangesLogo from "@/assets/ganges-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -67,17 +67,14 @@ const LoginPage = () => {
 
       <Card className="w-full max-w-md mx-auto bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-8">
-          {/* Logo */}
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-primary to-primary-glow rounded-2xl p-4 shadow-lg">
-            <img src={scooterLogo} alt="EcoRide" className="w-full h-full object-contain" />
-          </div>
-          
+          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-32 h-18 mx-auto mb-4 rounded-lg" />
+          <h1 className="text-3xl font-bold text-white mb-2">Ganges Support</h1>
           <div className="space-y-2">
             <CardTitle className="text-2xl font-bold text-foreground">
-              Welcome to EcoRide
+              Welcome to Ganges
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Your electric mobility support portal
+              Your electric scooter support portal
             </CardDescription>
           </div>
         </CardHeader>

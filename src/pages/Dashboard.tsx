@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Package, LogOut, User } from 'lucide-react';
-import scooterLogo from "@/assets/scooter-logo.png";
+import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -34,12 +35,20 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-electric-light to-electric-dark p-4">
+    <div 
+      className="min-h-screen p-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
-          <img src={scooterLogo} alt="EcoRide" className="w-10 h-10" />
-          <h1 className="text-2xl font-bold text-white">EcoRide Support</h1>
+          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
+          <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
         </div>
         <Button
           variant="ghost"
