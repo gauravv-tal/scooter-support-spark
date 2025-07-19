@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone, Zap } from "lucide-react";
 import gangesLogo from "@/assets/ganges-logo.png";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -58,14 +59,18 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/20 to-primary/5 flex items-center justify-center p-4">
-      {/* Background Electric Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-primary-glow/15 rounded-full blur-2xl animate-pulse delay-700"></div>
-      </div>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
-      <Card className="w-full max-w-md mx-auto bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl">
+      <Card className="w-full max-w-md mx-auto bg-white/10 border-white/20 backdrop-blur-sm shadow-2xl relative z-10">
         <CardHeader className="text-center space-y-4 pb-8">
           <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-32 h-18 mx-auto mb-4 rounded-lg" />
           <h1 className="text-3xl font-bold text-white mb-2">Ganges Support</h1>

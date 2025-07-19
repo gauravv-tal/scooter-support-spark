@@ -181,8 +181,50 @@ const Chat = () => {
     }
   };
 
-  const handleQuestionClick = (question: string) => {
-    setInputMessage(question);
+  const handleQuestionClick = async (question: string) => {
+    if (!currentConversationId || !user) return;
+
+    setIsLoading(true);
+
+    try {
+      // Add user message (the question)
+      const { error: userMsgError } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: currentConversationId,
+          content: question,
+          is_user_message: true
+        });
+
+      if (userMsgError) throw userMsgError;
+
+      // Find AI response
+      const response = findBestAnswer(question) || 
+        "I'm sorry, I couldn't find a specific answer to your question. Would you like me to escalate this to our support team?";
+
+      // Add AI response
+      const { error: aiMsgError } = await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: currentConversationId,
+          content: response,
+          is_user_message: false
+        });
+
+      if (aiMsgError) throw aiMsgError;
+
+      // Reload messages
+      loadMessages();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNotSatisfied = async (messageContent: string) => {
@@ -226,7 +268,17 @@ const Chat = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-electric-light to-electric-dark flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${require("@/assets/dashboard-bg.jpg")}`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="relative z-10 min-h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
         <Button
@@ -350,6 +402,7 @@ const Chat = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
