@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { generateDemoOrders } from '@/utils/demoOrders';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
@@ -40,8 +41,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_IN' && session?.user) {
-          // Create or update user profile
+          // Create or update user profile and generate demo orders
           setTimeout(async () => {
+            // Check if this is a new user by looking for existing profile
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('user_id', session.user.id)
+              .single();
+
+            const isNewUser = !existingProfile;
+
+            // Create or update user profile
             const { error } = await supabase
               .from('profiles')
               .upsert({
@@ -53,6 +64,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             
             if (error) {
               console.error('Error updating profile:', error);
+            }
+
+            // Generate demo orders for new users
+            if (isNewUser) {
+              await generateDemoOrders(session.user.id);
             }
           }, 0);
         }
