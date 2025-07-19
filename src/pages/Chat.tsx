@@ -26,6 +26,12 @@ interface PredefinedQuestion {
   category: string;
 }
 
+interface Conversation {
+  id: string;
+  title: string | null;
+  created_at: string;
+}
+
 const Chat = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +43,23 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  // Fetch all conversations for the user
+  const loadConversations = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setConversations(data || []);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -47,6 +70,7 @@ const Chat = () => {
   useEffect(() => {
     if (user) {
       loadPredefinedQuestions();
+      loadConversations();
       createNewConversation();
     }
   }, [user]);
@@ -213,6 +237,26 @@ const Chat = () => {
     }
   };
 
+  const handleSelectConversation = (conversationId: string) => {
+    setCurrentConversationId(conversationId);
+    loadMessagesForConversation(conversationId);
+  };
+
+  // Helper to load messages for a specific conversation
+  const loadMessagesForConversation = async (conversationId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at');
+      if (error) throw error;
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-electric-light to-electric-dark">
@@ -242,6 +286,34 @@ const Chat = () => {
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Conversations Sidebar */}
+        <div className="lg:w-64 p-4 border-b lg:border-b-0 lg:border-r border-white/20 bg-white/10 backdrop-blur-sm">
+          <Card className="bg-transparent border-none shadow-none">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Conversations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-48 lg:h-96">
+                <div className="space-y-2">
+                  {conversations.length === 0 ? (
+                    <div className="text-white/70 text-sm">No conversations yet.</div>
+                  ) : (
+                    conversations.map((conv) => (
+                      <Button
+                        key={conv.id}
+                        variant={conv.id === currentConversationId ? 'default' : 'ghost'}
+                        className={`w-full text-left h-auto p-2 text-sm ${conv.id === currentConversationId ? 'bg-neon-cyan text-electric-dark' : 'text-white/90 hover:bg-white/20'}`}
+                        onClick={() => handleSelectConversation(conv.id)}
+                      >
+                        {new Date(conv.created_at).toLocaleString()}
+                      </Button>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
         {/* Predefined Questions Sidebar */}
         <div className="lg:w-80 p-4 border-b lg:border-b-0 lg:border-r border-white/20">
           <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
@@ -270,7 +342,6 @@ const Chat = () => {
             </CardContent>
           </Card>
         </div>
-
         {/* Chat Area */}
         <div className="flex-1 flex flex-col">
           {/* Messages */}
@@ -314,7 +385,6 @@ const Chat = () => {
               )}
             </div>
           </ScrollArea>
-
           {/* Message Input */}
           <div className="p-4 bg-black/20 backdrop-blur-sm">
             <div className="max-w-4xl mx-auto flex gap-2">
