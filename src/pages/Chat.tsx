@@ -92,6 +92,10 @@ const Chat = () => {
 
       if (error) throw error;
       setCurrentConversationId(data.id);
+      // Load existing messages for this conversation
+      if (data.id) {
+        loadMessages();
+      }
     } catch (error) {
       console.error('Error creating conversation:', error);
     }
@@ -284,7 +288,7 @@ const Chat = () => {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div className="relative z-10 min-h-screen flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
