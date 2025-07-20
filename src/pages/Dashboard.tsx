@@ -3,19 +3,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, Package, LogOut, User, History, HeadphonesIcon, Settings } from 'lucide-react';
+import { MessageSquare, Package, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import gangesLogo from "@/assets/ganges-logo.png";
-import { generateDemoOrdersForExistingUser } from "@/utils/generateDemoForExisting";
+import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { Menu } from 'lucide-react';
 import scooterModelsBg from "@/assets/scooter-models-bg.jpg";
 
 const Dashboard = () => {
@@ -45,13 +36,6 @@ const Dashboard = () => {
     fetchUserRole();
   }, [user]);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } finally {
-      navigate('/');
-    }
-  };
 
   if (loading) {
     return (
@@ -76,49 +60,26 @@ const Dashboard = () => {
         backgroundBlendMode: 'overlay'
       }}
     >
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-3">
-          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
-          <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
+      <Header />
+
+      <div className="max-w-4xl mx-auto">
+        {/* Welcome Section */}
+        <div className="mb-8 flex justify-center">
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="text-white flex items-center justify-center gap-2">
+                <User className="w-5 h-5" />
+                Welcome back!
+              </CardTitle>
+              <CardDescription className="text-white/80">
+                Phone: {user.phone || 'Not provided'}
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-2 rounded-md text-white hover:bg-white/10 focus:outline-none">
-              <Menu className="w-7 h-7" />
-              <span className="sr-only">Open menu</span>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/support-queries')}>Support Queries</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/chat-history')}>Chat History</DropdownMenuItem>
-            <DropdownMenuItem onClick={generateDemoOrdersForExistingUser}>Generate Demo Orders</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700">
-              <LogOut className="w-4 h-4 mr-2" />Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
 
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Welcome back!
-            </CardTitle>
-            <CardDescription className="text-white/80">
-              Phone: {user.phone || 'Not provided'}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* Action Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        {/* Action Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 max-w-2xl mx-auto">
         <Card 
           className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
           onClick={() => navigate('/chat')}
@@ -171,6 +132,7 @@ const Dashboard = () => {
             </Button>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
