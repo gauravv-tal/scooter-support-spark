@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const GANGES_MODELS = ['Ganges-X', 'Ganges-2X', 'Ganges-4X'] as const;
 const CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Kolkata', 'Ahmedabad'];
-const ORDER_STATUSES = ['processing', 'shipped', 'delivered', 'confirmed'];
+const ORDER_STATUSES = ['processing', 'shipped', 'delivered', 'cancelled'];
 
 function getDeliveryDate(model: string, orderDate: Date): Date {
   const deliveryDate = new Date(orderDate);
