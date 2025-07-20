@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Plus } from 'lucide-react';
+import { MessageSquare, Plus, File, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
@@ -14,6 +15,7 @@ interface Message {
   content: string;
   is_user_message: boolean;
   created_at: string;
+  file_url?: string;
 }
 
 interface Conversation {
@@ -27,6 +29,7 @@ interface Conversation {
 const ChatHistory = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +54,7 @@ const ChatHistory = () => {
         .from('chat_conversations')
         .select(`
           *,
-          chat_messages(id, content, is_user_message, created_at)
+          chat_messages(id, content, is_user_message, created_at, file_url)
         `)
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
@@ -77,6 +80,30 @@ const ChatHistory = () => {
 
   const handleConversationClick = (conversation: Conversation) => {
     setSelectedConversation(conversation);
+  };
+
+  const handleDownloadFile = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      toast({
+        title: "Download Error",
+        description: "Failed to download file. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading || isLoading) {
@@ -169,14 +196,40 @@ const ChatHistory = () => {
                                 ? 'bg-neon-cyan text-electric-dark'
                                 : 'bg-white/10 text-electric-light backdrop-blur-sm border border-white/20'
                             }`}
-                          >
-                            <p className="text-sm">{message.content}</p>
-                            <p className={`text-xs mt-1 ${
-                              message.is_user_message ? 'text-electric-dark/70' : 'text-white/60'
-                            }`}>
-                              {formatDate(message.created_at)}
-                            </p>
-                          </div>
+                           >
+                             <p className="text-sm">{message.content}</p>
+                             
+                             {/* File attachment display */}
+                             {message.file_url && (
+                               <div className="mt-2 p-2 bg-black/20 rounded border border-white/20">
+                                 <div className="flex items-center justify-between">
+                                   <div className="flex items-center gap-2">
+                                     <File className="w-4 h-4" />
+                                     <span className="text-xs">
+                                       {message.content.replace('Shared a file: ', '')}
+                                     </span>
+                                   </div>
+                                   <Button
+                                     size="sm"
+                                     variant="ghost"
+                                     className="h-6 px-2 text-white/70 hover:text-white hover:bg-white/20"
+                                     onClick={() => handleDownloadFile(
+                                       message.file_url!, 
+                                       message.content.replace('Shared a file: ', '')
+                                     )}
+                                   >
+                                     <Download className="w-3 h-3" />
+                                   </Button>
+                                 </div>
+                               </div>
+                             )}
+                             
+                             <p className={`text-xs mt-1 ${
+                               message.is_user_message ? 'text-electric-dark/70' : 'text-white/60'
+                             }`}>
+                               {formatDate(message.created_at)}
+                             </p>
+                           </div>
                         </div>
                       ))
                     )}
