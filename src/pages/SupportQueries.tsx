@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, MessageSquare, Clock, CheckCircle } from 'lucide-react';
+import { MessageSquare, Clock, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import gangesLogo from "@/assets/ganges-logo.png";
+import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface CustomerQuery {
@@ -101,19 +101,7 @@ const SupportQueries = () => {
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-12 h-7 object-contain rounded" />
-          <h1 className="text-xl font-bold text-white">Support Queries</h1>
-        </div>
+        <Header />
 
         {/* Content */}
         <div className="flex-1 p-4">

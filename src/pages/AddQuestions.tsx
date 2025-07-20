@@ -8,7 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import Header from "@/components/Header";
+import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface Question {
   id: string;
@@ -153,35 +155,16 @@ const AddQuestions = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-no-repeat"
-         style={{ backgroundImage: "url('/src/assets/dashboard-bg.jpg')" }}>
-      
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/30 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="text-white hover:bg-white/10"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-              <div className="flex items-center space-x-3">
-                <img 
-                  src="/src/assets/ganges-logo.png" 
-                  alt="Ganges" 
-                  className="h-8 w-auto"
-                />
-                <h1 className="text-xl font-semibold text-white">Admin - Add Questions</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div 
+      className="min-h-screen p-4 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <Header />
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         

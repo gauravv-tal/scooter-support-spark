@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import gangesLogo from "@/assets/ganges-logo.png";
+import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
 interface Order {
@@ -118,19 +118,7 @@ const Orders = () => {
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div className="relative z-10 min-h-screen">
-        {/* Header */}
-        <div className="flex items-center gap-3 p-4 bg-black/20 backdrop-blur-sm">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/dashboard')}
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-12 h-7 object-contain rounded" />
-          <h1 className="text-xl font-bold text-white">My Orders</h1>
-        </div>
+        <Header />
 
       {/* Orders List */}
       <div className="p-4 max-w-4xl mx-auto">
