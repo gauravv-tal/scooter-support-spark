@@ -64,10 +64,10 @@ const Dashboard = () => {
 
       <div className="max-w-4xl mx-auto">
         {/* Welcome Section */}
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8">
           <Card className="bg-white/10 border-white/20 backdrop-blur-sm w-full max-w-md">
-            <CardHeader className="text-center">
-              <CardTitle className="text-white flex items-center justify-center gap-2">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
                 <User className="w-5 h-5" />
                 Welcome back!
               </CardTitle>
