@@ -386,7 +386,7 @@ const Chat = () => {
           query_text: messageContent,
           admin_response: "Thanks for submitting your questions, support team soon will respond on it",
           response_date: new Date().toISOString(),
-          status: 'responded'
+          status: 'resolved'
         });
 
       if (error) throw error;
