@@ -565,10 +565,10 @@ const Chat = () => {
                                   Not helpful?
                                 </Button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-white/10 border-white/20 backdrop-blur-sm">
+                              <AlertDialogContent className="bg-black/80 border-white/30 backdrop-blur-md text-white">
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle className="text-white">Submit Query to Support</AlertDialogTitle>
-                                  <AlertDialogDescription className="text-white/70">
+                                  <AlertDialogTitle className="text-white text-lg">Submit Query to Support</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-white/80">
                                     Please describe your issue or question. Our support team will review it and get back to you.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
@@ -577,17 +577,17 @@ const Chat = () => {
                                     value={queryText}
                                     onChange={(e) => setQueryText(e.target.value)}
                                     placeholder="Describe your issue or question..."
-                                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 min-h-[100px]"
+                                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/30 min-h-[100px]"
                                   />
                                 </div>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel className="text-white border-white/30 hover:bg-white/20">
+                                <AlertDialogFooter className="gap-2">
+                                  <AlertDialogCancel className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white">
                                     Cancel
                                   </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={handleSubmitQuery}
                                     disabled={!queryText.trim() || submittingQuery}
-                                    className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90"
+                                    className="bg-white text-electric-dark hover:bg-white/90 font-medium"
                                   >
                                     {submittingQuery ? 'Submitting...' : 'Submit Query'}
                                   </AlertDialogAction>
