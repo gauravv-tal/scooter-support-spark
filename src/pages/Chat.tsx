@@ -537,12 +537,12 @@ const Chat = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Select value={selectedOrderId || ""} onValueChange={(value) => setSelectedOrderId(value || null)}>
+              <Select value={selectedOrderId || "general"} onValueChange={(value) => setSelectedOrderId(value === "general" ? null : value)}>
                 <SelectTrigger className="bg-white/10 border-white/30 text-white">
                   <SelectValue placeholder="Select an order to ask about" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/30">
-                  <SelectItem value="">Ask general questions</SelectItem>
+                  <SelectItem value="general">Ask general questions</SelectItem>
                   {orders.map((order) => (
                     <SelectItem key={order.id} value={order.id} className="text-white hover:bg-white/20">
                       <div className="flex flex-col">
