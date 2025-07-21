@@ -9,6 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Paperclip, ThumbsDown, MessageSquare, Upload, File, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
@@ -46,6 +48,9 @@ const Chat = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [queryDialogOpen, setQueryDialogOpen] = useState(false);
+  const [queryText, setQueryText] = useState('');
+  const [submittingQuery, setSubmittingQuery] = useState(false);
 
   // Fetch all conversations for the user
   const loadConversations = async () => {
@@ -374,8 +379,18 @@ const Chat = () => {
     }
   };
 
-  const handleNotSatisfied = async (messageContent: string) => {
-    if (!user) return;
+  const handleNotSatisfied = () => {
+    // Find the user's last message to auto-populate the query
+    const userMessages = messages.filter(msg => msg.is_user_message);
+    const lastUserMessage = userMessages[userMessages.length - 1];
+    setQueryText(lastUserMessage?.content || '');
+    setQueryDialogOpen(true);
+  };
+
+  const handleSubmitQuery = async () => {
+    if (!user || !queryText.trim()) return;
+
+    setSubmittingQuery(true);
 
     try {
       const { error } = await supabase
@@ -383,7 +398,7 @@ const Chat = () => {
         .insert({
           user_id: user.id,
           conversation_id: currentConversationId,
-          query_text: messageContent,
+          query_text: queryText.trim(),
           admin_response: "Thanks for submitting your questions, support team soon will respond on it",
           response_date: new Date().toISOString(),
           status: 'resolved'
@@ -395,6 +410,9 @@ const Chat = () => {
         title: "Query Submitted",
         description: "Your query has been submitted to our support team for review.",
       });
+
+      setQueryDialogOpen(false);
+      setQueryText('');
     } catch (error) {
       console.error('Error submitting query:', error);
       toast({
@@ -402,6 +420,8 @@ const Chat = () => {
         description: "Failed to submit query. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSubmittingQuery(false);
     }
   };
 
@@ -531,19 +551,51 @@ const Chat = () => {
                          </div>
                        )}
                        
-                       {!message.is_user_message && (
-                         <div className="mt-2 flex gap-2">
-                           <Button
-                             size="sm"
-                             variant="ghost"
-                             className="text-white/70 hover:text-white hover:bg-white/20 h-6 px-2"
-                             onClick={() => handleNotSatisfied(message.content)}
-                           >
-                             <ThumbsDown className="w-3 h-3 mr-1" />
-                             Not helpful?
-                           </Button>
-                         </div>
-                       )}
+                        {!message.is_user_message && (
+                          <div className="mt-2 flex gap-2">
+                            <AlertDialog open={queryDialogOpen} onOpenChange={setQueryDialogOpen}>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-white/70 hover:text-white hover:bg-white/20 h-6 px-2"
+                                  onClick={handleNotSatisfied}
+                                >
+                                  <ThumbsDown className="w-3 h-3 mr-1" />
+                                  Not helpful?
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-white/10 border-white/20 backdrop-blur-sm">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-white">Submit Query to Support</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-white/70">
+                                    Please describe your issue or question. Our support team will review it and get back to you.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Textarea
+                                    value={queryText}
+                                    onChange={(e) => setQueryText(e.target.value)}
+                                    placeholder="Describe your issue or question..."
+                                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 min-h-[100px]"
+                                  />
+                                </div>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="text-white border-white/30 hover:bg-white/20">
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={handleSubmitQuery}
+                                    disabled={!queryText.trim() || submittingQuery}
+                                    className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90"
+                                  >
+                                    {submittingQuery ? 'Submitting...' : 'Submit Query'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        )}
                     </div>
                   </div>
                 ))
@@ -580,7 +632,7 @@ const Chat = () => {
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90 font-medium px-6"
+                className="bg-white text-electric-dark hover:bg-white/90 font-medium px-6"
               >
                 <Send className="w-4 h-4" />
               </Button>
