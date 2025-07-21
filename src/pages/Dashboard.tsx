@@ -63,20 +63,6 @@ const Dashboard = () => {
       <Header />
 
       <div className="max-w-4xl mx-auto">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <Card className="bg-white/10 border-white/20 backdrop-blur-sm w-full max-w-md">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Welcome back!
-              </CardTitle>
-              <CardDescription className="text-white/80">
-                Phone: {user.phone || 'Not provided'}
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
 
         {/* Action Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 max-w-2xl mx-auto">

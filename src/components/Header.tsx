@@ -2,7 +2,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Menu, LogOut } from 'lucide-react';
 import gangesLogo from "@/assets/ganges-logo.png";
-import { generateDemoOrdersForExistingUser } from "@/utils/generateDemoForExisting";
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -12,8 +13,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const Header = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("user_id", user.id)
+          .single();
+        
+        setUserRole(profile?.role || 'customer');
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
@@ -29,7 +47,11 @@ const Header = () => {
         <img src={gangesLogo} alt="Ganges Electric Scooters" className="w-20 h-12 object-contain rounded" />
         <h1 className="text-2xl font-bold text-white">Ganges Support</h1>
       </div>
-      <DropdownMenu>
+      <div className="flex items-center gap-4">
+        {user?.phone && (
+          <span className="text-white/80">{user.phone}</span>
+        )}
+        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="p-2 rounded-md text-white hover:bg-white/10 focus:outline-none">
             <Menu className="w-7 h-7" />
@@ -38,16 +60,18 @@ const Header = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => navigate('/dashboard')}>Dashboard</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
+          {userRole === 'admin' && (
+            <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => navigate('/support-queries')}>Support Queries</DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate('/chat-history')}>Chat History</DropdownMenuItem>
-          <DropdownMenuItem onClick={generateDemoOrdersForExistingUser}>Generate Demo Orders</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700">
             <LogOut className="w-4 h-4 mr-2" />Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };
