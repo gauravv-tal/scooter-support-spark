@@ -448,8 +448,8 @@ const Chat = () => {
       }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-      <div className="relative z-10 min-h-screen flex flex-col">
-      <Header />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header />
 
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Conversations Sidebar */}
@@ -614,7 +614,7 @@ const Chat = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
       </div>
     </div>
   );

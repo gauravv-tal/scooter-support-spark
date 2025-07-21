@@ -53,13 +53,14 @@ const Dashboard = () => {
     <div 
       className="min-h-screen p-4 relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${scooterModelsBg}), url(${dashboardBg})`,
-        backgroundSize: 'cover, cover',
-        backgroundPosition: 'center, center',
-        backgroundAttachment: 'fixed',
-        backgroundBlendMode: 'overlay'
+        backgroundImage: `url(${dashboardBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }}
     >
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="relative z-10">
       <Header />
 
       <div className="max-w-4xl mx-auto">
@@ -117,6 +118,7 @@ const Dashboard = () => {
             </Button>
           </CardContent>
         </Card>
+        </div>
         </div>
       </div>
     </div>

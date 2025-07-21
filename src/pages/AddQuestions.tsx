@@ -143,9 +143,17 @@ const AddQuestions = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
-           style={{ backgroundImage: "url('/src/assets/dashboard-bg.jpg')" }}>
-        <div className="text-white text-xl">Loading...</div>
+      <div 
+        className="min-h-screen flex items-center justify-center relative"
+        style={{
+          backgroundImage: `url(${dashboardBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div className="relative z-10 text-white text-xl">Loading...</div>
       </div>
     );
   }
@@ -158,114 +166,117 @@ const AddQuestions = () => {
     <div 
       className="min-h-screen p-4 relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${dashboardBg})`,
+        backgroundImage: `url(${dashboardBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundRepeat: 'no-repeat'
       }}
     >
-      <Header />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div className="relative z-10">
+        <Header />
 
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        
-        {/* Add Question Form */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <Plus className="h-5 w-5 mr-2" />
-              Add New Question
-            </CardTitle>
-            <CardDescription className="text-white/70">
-              Create predefined questions and answers for customer support
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="category" className="text-white">Category (Optional)</Label>
-                <Input
-                  id="category"
-                  type="text"
-                  placeholder="e.g., Battery, Maintenance, Troubleshooting"
-                  value={newQuestion.category}
-                  onChange={(e) => setNewQuestion(prev => ({ ...prev, category: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                />
-              </div>
-              <div>
-                <Label htmlFor="question" className="text-white">Question *</Label>
-                <Input
-                  id="question"
-                  type="text"
-                  placeholder="Enter the question"
-                  value={newQuestion.question}
-                  onChange={(e) => setNewQuestion(prev => ({ ...prev, question: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="answer" className="text-white">Answer *</Label>
-                <Textarea
-                  id="answer"
-                  placeholder="Enter the answer"
-                  value={newQuestion.answer}
-                  onChange={(e) => setNewQuestion(prev => ({ ...prev, answer: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 min-h-24"
-                  required
-                />
-              </div>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isSubmitting ? "Adding..." : "Add Question"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="max-w-4xl mx-auto p-6 space-y-6">
+          
+          {/* Add Question Form */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <Plus className="h-5 w-5 mr-2" />
+                Add New Question
+              </CardTitle>
+              <CardDescription className="text-white/70">
+                Create predefined questions and answers for customer support
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="category" className="text-white">Category (Optional)</Label>
+                  <Input
+                    id="category"
+                    type="text"
+                    placeholder="e.g., Battery, Maintenance, Troubleshooting"
+                    value={newQuestion.category}
+                    onChange={(e) => setNewQuestion(prev => ({ ...prev, category: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="question" className="text-white">Question *</Label>
+                  <Input
+                    id="question"
+                    type="text"
+                    placeholder="Enter the question"
+                    value={newQuestion.question}
+                    onChange={(e) => setNewQuestion(prev => ({ ...prev, question: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="answer" className="text-white">Answer *</Label>
+                  <Textarea
+                    id="answer"
+                    placeholder="Enter the answer"
+                    value={newQuestion.answer}
+                    onChange={(e) => setNewQuestion(prev => ({ ...prev, answer: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 min-h-24"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isSubmitting ? "Adding..." : "Add Question"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        {/* Questions List */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white">Existing Questions</CardTitle>
-            <CardDescription className="text-white/70">
-              Manage all predefined questions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {questions.length === 0 ? (
-                <p className="text-white/70 text-center py-8">No questions found</p>
-              ) : (
-                questions.map((question) => (
-                  <div key={question.id} className="bg-white/5 p-4 rounded-lg border border-white/10">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        {question.category && (
-                          <span className="text-xs bg-blue-600/30 text-blue-200 px-2 py-1 rounded mb-2 inline-block">
-                            {question.category}
-                          </span>
-                        )}
-                        <h3 className="text-white font-medium mb-2">{question.question}</h3>
-                        <p className="text-white/70 text-sm">{question.answer}</p>
+          {/* Questions List */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardHeader>
+              <CardTitle className="text-white">Existing Questions</CardTitle>
+              <CardDescription className="text-white/70">
+                Manage all predefined questions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {questions.length === 0 ? (
+                  <p className="text-white/70 text-center py-8">No questions found</p>
+                ) : (
+                  questions.map((question) => (
+                    <div key={question.id} className="bg-white/5 p-4 rounded-lg border border-white/10">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          {question.category && (
+                            <span className="text-xs bg-blue-600/30 text-blue-200 px-2 py-1 rounded mb-2 inline-block">
+                              {question.category}
+                            </span>
+                          )}
+                          <h3 className="text-white font-medium mb-2">{question.question}</h3>
+                          <p className="text-white/70 text-sm">{question.answer}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(question.id)}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(question.id)}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -100,7 +100,7 @@ const SupportQueries = () => {
       }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
 
         {/* Content */}

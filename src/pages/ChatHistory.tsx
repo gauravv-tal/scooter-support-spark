@@ -129,7 +129,7 @@ const ChatHistory = () => {
       }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
 
         {/* Content */}
@@ -228,15 +228,15 @@ const ChatHistory = () => {
                                message.is_user_message ? 'text-electric-dark/70' : 'text-white/60'
                              }`}>
                                {formatDate(message.created_at)}
-                             </p>
-                           </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </ScrollArea>
-              </>
-            ) : (
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </>
+              ) : (
               <div className="flex-1 flex items-center justify-center">
                 <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
                   <CardContent className="p-8 text-center">
