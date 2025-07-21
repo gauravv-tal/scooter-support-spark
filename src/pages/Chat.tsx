@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Paperclip, ThumbsDown, MessageSquare, Upload, File, Download } from 'lucide-react';
+import { Send, Paperclip, ThumbsDown, MessageSquare, Upload, File, Download, Package, Calendar, Truck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Header from '@/components/Header';
 import dashboardBg from "@/assets/dashboard-bg.jpg";
 
@@ -35,6 +36,16 @@ interface Conversation {
   created_at: string;
 }
 
+interface ScooterOrder {
+  id: string;
+  order_number: string;
+  scooter_model: string;
+  order_status: string;
+  order_date: string;
+  expected_delivery?: string;
+  tracking_number?: string;
+}
+
 const Chat = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -51,6 +62,8 @@ const Chat = () => {
   const [queryDialogOpen, setQueryDialogOpen] = useState(false);
   const [queryText, setQueryText] = useState('');
   const [submittingQuery, setSubmittingQuery] = useState(false);
+  const [orders, setOrders] = useState<ScooterOrder[]>([]);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   // Fetch all conversations for the user
   const loadConversations = async () => {
@@ -78,6 +91,7 @@ const Chat = () => {
     if (user) {
       loadPredefinedQuestions();
       loadConversations();
+      loadOrders();
       createNewConversation();
     }
   }, [user]);
@@ -107,6 +121,22 @@ const Chat = () => {
     }
   };
 
+  const loadOrders = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('scooter_orders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('order_date', { ascending: false });
+
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (error) {
+      console.error('Error loading orders:', error);
+    }
+  };
+
   const createNewConversation = async () => {
     if (!user) return;
 
@@ -131,10 +161,32 @@ const Chat = () => {
     }
   };
 
-  const findBestAnswer = (question: string): string | null => {
+  const findBestAnswer = (question: string, orderContext?: ScooterOrder): string | null => {
     const lowerQuestion = question.toLowerCase();
     
-    // Simple keyword matching
+    // Check if this is an order-specific question
+    if (orderContext && (lowerQuestion.includes('order') || lowerQuestion.includes('delivery') || lowerQuestion.includes('status') || lowerQuestion.includes('track'))) {
+      if (lowerQuestion.includes('status') || lowerQuestion.includes('where') || lowerQuestion.includes('update')) {
+        return `Your order #${orderContext.order_number} for ${orderContext.scooter_model} is currently ${orderContext.order_status}. ${orderContext.expected_delivery ? `Expected delivery: ${new Date(orderContext.expected_delivery).toLocaleDateString()}` : ''} ${orderContext.tracking_number ? `Tracking number: ${orderContext.tracking_number}` : ''}`;
+      }
+      
+      if (lowerQuestion.includes('delivery') || lowerQuestion.includes('when')) {
+        return orderContext.expected_delivery 
+          ? `Your order #${orderContext.order_number} is expected to be delivered on ${new Date(orderContext.expected_delivery).toLocaleDateString()}.`
+          : `Your order #${orderContext.order_number} is currently ${orderContext.order_status}. We'll update you with delivery information soon.`;
+      }
+      
+      if (lowerQuestion.includes('track') || lowerQuestion.includes('tracking')) {
+        return orderContext.tracking_number 
+          ? `Your tracking number for order #${orderContext.order_number} is: ${orderContext.tracking_number}`
+          : `Tracking information for order #${orderContext.order_number} will be available once the order is shipped.`;
+      }
+      
+      // General order info
+      return `Order #${orderContext.order_number} - ${orderContext.scooter_model} (Status: ${orderContext.order_status}, Ordered: ${new Date(orderContext.order_date).toLocaleDateString()})`;
+    }
+    
+    // Regular predefined questions matching
     for (const qa of predefinedQuestions) {
       const keywords = qa.question.toLowerCase().split(' ');
       const questionWords = lowerQuestion.split(' ');
@@ -287,8 +339,9 @@ const Chat = () => {
 
       if (userMsgError) throw userMsgError;
 
-      // Find AI response
-      const response = findBestAnswer(userMessage) || 
+      // Find AI response with order context if selected
+      const selectedOrder = selectedOrderId ? orders.find(order => order.id === selectedOrderId) : undefined;
+      const response = findBestAnswer(userMessage, selectedOrder) || 
         "I'm sorry, I couldn't find a specific answer to your question. Would you like me to escalate this to our support team?";
 
       // Add AI response
@@ -350,8 +403,9 @@ const Chat = () => {
 
       if (userMsgError) throw userMsgError;
 
-      // Find AI response
-      const response = findBestAnswer(question) || 
+      // Find AI response with order context if selected
+      const selectedOrder = selectedOrderId ? orders.find(order => order.id === selectedOrderId) : undefined;
+      const response = findBestAnswer(question, selectedOrder) || 
         "I'm sorry, I couldn't find a specific answer to your question. Would you like me to escalate this to our support team?";
 
       // Add AI response
@@ -472,15 +526,71 @@ const Chat = () => {
         <Header />
 
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Conversations Sidebar */}
-        {/* Predefined Questions Sidebar */}
-        <div className="lg:w-80 p-4 border-b lg:border-b-0 lg:border-r border-white/20">
+        {/* Left Sidebar */}
+        <div className="lg:w-80 p-4 border-b lg:border-b-0 lg:border-r border-white/20 space-y-4">
+          {/* Order Selection */}
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white text-lg flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Your Orders
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select value={selectedOrderId || ""} onValueChange={(value) => setSelectedOrderId(value || null)}>
+                <SelectTrigger className="bg-white/10 border-white/30 text-white">
+                  <SelectValue placeholder="Select an order to ask about" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-white/30">
+                  <SelectItem value="">Ask general questions</SelectItem>
+                  {orders.map((order) => (
+                    <SelectItem key={order.id} value={order.id} className="text-white hover:bg-white/20">
+                      <div className="flex flex-col">
+                        <span className="font-medium">#{order.order_number}</span>
+                        <span className="text-xs text-white/70">{order.scooter_model}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {selectedOrderId && (
+                <div className="mt-3 p-3 bg-black/20 rounded border border-white/20">
+                  {(() => {
+                    const order = orders.find(o => o.id === selectedOrderId);
+                    if (!order) return null;
+                    return (
+                      <div className="space-y-2 text-sm text-white">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-4 h-4" />
+                          <span className="font-medium">#{order.order_number}</span>
+                        </div>
+                        <div className="text-white/80">{order.scooter_model}</div>
+                        <div className="flex items-center gap-2 text-white/70">
+                          <Truck className="w-3 h-3" />
+                          <span className="capitalize">{order.order_status}</span>
+                        </div>
+                        {order.expected_delivery && (
+                          <div className="flex items-center gap-2 text-white/70">
+                            <Calendar className="w-3 h-3" />
+                            <span>Expected: {new Date(order.expected_delivery).toLocaleDateString()}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Predefined Questions */}
           <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-white text-lg">Quick Questions</CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-48 lg:h-96">
+              <ScrollArea className="h-48 lg:h-64">
                 <div className="space-y-2">
                   {predefinedQuestions.map((qa) => (
                     <div key={qa.id} className="space-y-1">
@@ -624,7 +734,7 @@ const Chat = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask a question about your Ganges scooter..."
+                placeholder={selectedOrderId ? "Ask about your selected order..." : "Ask a question about your Ganges scooter..."}
                 className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:border-white/50"
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
                 disabled={isLoading}
