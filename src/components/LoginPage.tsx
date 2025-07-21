@@ -13,6 +13,7 @@ const LoginPage = () => {
   const [otp, setOtp] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const countryCode = "+91"; // Default India country code
   const { signInWithPhone, verifyOtp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,13 +24,15 @@ const LoginPage = () => {
   }, [user, navigate]);
 
   const handleSendOtp = async () => {
-    if (!phoneNumber || phoneNumber.length < 10) {
+    if (!phoneNumber || phoneNumber.length !== 10) {
       return;
     }
     
     setIsLoading(true);
     try {
-      const { error } = await signInWithPhone(phoneNumber);
+      // Combine country code with phone number
+      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+      const { error } = await signInWithPhone(fullPhoneNumber);
       if (!error) {
         setShowOtp(true);
       }
@@ -47,7 +50,9 @@ const LoginPage = () => {
     
     setIsLoading(true);
     try {
-      const { error } = await verifyOtp(phoneNumber, otp);
+      // Use full phone number for verification
+      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+      const { error } = await verifyOtp(fullPhoneNumber, otp);
       if (!error) {
         navigate('/dashboard');
       }
@@ -55,6 +60,13 @@ const LoginPage = () => {
       console.error("Failed to verify OTP:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow digits
+    if (value.length <= 10) {
+      setPhoneNumber(value);
     }
   };
 
@@ -94,21 +106,27 @@ const LoginPage = () => {
                 </label>
                 <div className="relative">
                   <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <div className="absolute left-10 top-1/2 transform -translate-y-1/2 text-foreground font-medium text-sm">
+                    +91
+                  </div>
+                  <div className="absolute left-20 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                    |
+                  </div>
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="9876543210"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10 h-12 bg-background/50 border-border/60 focus:border-primary/60 focus:ring-primary/20"
-                    maxLength={15}
+                    onChange={handlePhoneNumberChange}
+                    className="pl-24 h-12 bg-background/50 border-border/60 focus:border-primary/60 focus:ring-primary/20"
+                    maxLength={10}
                   />
                 </div>
               </div>
 
               <Button 
                 onClick={handleSendOtp}
-                disabled={!phoneNumber || phoneNumber.length < 10 || isLoading}
+                disabled={!phoneNumber || phoneNumber.length !== 10 || isLoading}
                 className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90 text-primary-foreground font-semibold shadow-lg transition-all duration-200 hover:shadow-xl disabled:opacity-50"
               >
                 {isLoading ? (
@@ -132,7 +150,7 @@ const LoginPage = () => {
                   Enter Verification Code
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  We've sent a 6-digit code to {phoneNumber}
+                  We've sent a 6-digit code to +91{phoneNumber}
                 </p>
               </div>
 
