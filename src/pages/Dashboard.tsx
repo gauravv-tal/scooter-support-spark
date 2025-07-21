@@ -121,8 +121,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button 
-              variant="outline" 
-              className="w-full border-white/30 text-white hover:bg-white/20"
+              className="w-full bg-neon-cyan text-electric-dark hover:bg-neon-cyan/90"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate('/orders');
