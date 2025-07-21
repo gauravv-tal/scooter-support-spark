@@ -517,13 +517,13 @@ const Chat = () => {
                     key={message.id}
                     className={`flex ${message.is_user_message ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div
-                      className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-2 rounded-lg ${
-                        message.is_user_message
-                          ? 'bg-neon-cyan text-electric-dark'
-                          : 'bg-white/10 text-white backdrop-blur-sm'
-                      }`}
-                     >
+                     <div
+                       className={`max-w-xs lg:max-w-md xl:max-lg px-4 py-2 rounded-lg ${
+                         message.is_user_message
+                           ? 'bg-white/10 text-white backdrop-blur-sm border border-white/30'
+                           : 'bg-white/10 text-white backdrop-blur-sm'
+                       }`}
+                      >
                        <p className="text-sm">{message.content}</p>
                        
                        {/* File attachment display */}
@@ -587,7 +587,7 @@ const Chat = () => {
                                   <AlertDialogAction
                                     onClick={handleSubmitQuery}
                                     disabled={!queryText.trim() || submittingQuery}
-                                    className="bg-white text-electric-dark hover:bg-white/90 font-medium"
+                                    className="bg-green-500 text-white hover:bg-green-600 font-medium"
                                   >
                                     {submittingQuery ? 'Submitting...' : 'Submit Query'}
                                   </AlertDialogAction>
