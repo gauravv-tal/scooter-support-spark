@@ -26,10 +26,20 @@ vi.mock('@/integrations/supabase/client', () => ({
 }))
 
 // Mock useAuth hook and AuthProvider
-vi.mock('@/hooks/useAuth', () => ({
-  useAuth: vi.fn(),
-  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
-}))
+vi.mock('@/hooks/useAuth', () => {
+  function AuthProvider({ children }) { return children; }
+  return {
+    useAuth: vi.fn(() => ({
+      user: { id: 'test', phone: '9999999999' },
+      signOut: vi.fn(),
+      loading: false,
+      session: null,
+      signInWithPhone: vi.fn(),
+      verifyOtp: vi.fn(),
+    })),
+    AuthProvider,
+  };
+});
 
 // Mock React Router
 vi.mock('react-router-dom', async () => {
