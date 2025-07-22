@@ -1,0 +1,44 @@
+import '@testing-library/jest-dom'
+import { vi } from 'vitest'
+
+// Mock Supabase client
+const mockSupabase = {
+  auth: {
+    onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
+    signInWithOtp: vi.fn(),
+    verifyOtp: vi.fn(),
+    signOut: vi.fn(),
+  },
+  from: vi.fn(() => ({
+    select: vi.fn(() => ({
+      eq: vi.fn(() => ({
+        single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+      })),
+    })),
+    upsert: vi.fn(() => Promise.resolve({ data: null, error: null })),
+  })),
+}
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: mockSupabase,
+}))
+
+// Mock React Router
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+    useLocation: () => ({ pathname: '/' }),
+  }
+})
+
+// Mock window.location
+Object.defineProperty(window, 'location', {
+  value: {
+    href: 'http://localhost:3000',
+    origin: 'http://localhost:3000',
+  },
+  writable: true,
+})
