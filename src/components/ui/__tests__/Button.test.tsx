@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/dom'
 import { render } from '@/test/test-utils'
 import { Button } from '@/components/ui/button'
 
