@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
+import React from 'react'
 
 // Mock Supabase client
 const mockSupabase = {
@@ -22,6 +23,12 @@ const mockSupabase = {
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: mockSupabase,
+}))
+
+// Mock useAuth hook and AuthProvider
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: vi.fn(),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 // Mock React Router
