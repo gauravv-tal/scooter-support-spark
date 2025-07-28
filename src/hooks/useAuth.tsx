@@ -138,47 +138,46 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           otp: '346555', 
           role: 'admin',
           userId: '5a19298f-4737-4335-b7a9-57f36fed3f53',
-          displayName: 'Mock Admin User'
+          displayName: 'Mock Admin User',
+          email: 'admin@test.com'
         },
         '+918888844444': { 
           otp: '346444', 
           role: 'customer',
           userId: 'd66413b6-b6c1-413a-9000-abb5520a8f17',
-          displayName: 'Mock Customer User'
+          displayName: 'Mock Customer User',
+          email: 'customer@test.com'
         }
       };
-      
-      console.log('Phone number received:', phone, 'OTP received:', otp);
-      console.log('Available mock credentials:', Object.keys(mockCredentials));
       
       if (mockCredentials[phone as keyof typeof mockCredentials]) {
         const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
         if (otp === mockUser.otp) {
-          // Create a mock session with actual database UUID
-          const mockSession = {
-            user: {
-              id: mockUser.userId,
-              phone: phone,
-              email: `${mockUser.role}@test.com`,
-              user_metadata: { 
-                role: mockUser.role,
-                display_name: mockUser.displayName
-              }
-            }
-          };
-          
-          console.log('Mock session created:', mockSession);
-          console.log('Mock user role:', mockUser.role);
-          
-          setSession(mockSession as any);
-          setUser(mockSession.user as any);
-          
-          toast({
-            title: "Welcome!",
-            description: `Logged in as ${mockUser.role} (mock).`,
+          // Create a proper Supabase session by signing in with the existing user
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: mockUser.email,
+            password: 'mockpassword123'
           });
           
-          return { error: null };
+          if (error) {
+            console.log('Direct sign-in failed, trying to create user first');
+            // If user doesn't exist, we should have created them in the migration
+            // But let's handle this gracefully
+            toast({
+              title: "Authentication Error",
+              description: "Mock user not found in database. Please ensure users are properly set up.",
+              variant: "destructive",
+            });
+            return { error };
+          }
+          
+          if (data.user) {
+            toast({
+              title: "Welcome!",
+              description: `Logged in as ${mockUser.role} (mock).`,
+            });
+            return { error: null };
+          }
         } else {
           toast({
             title: "Verification Failed",
