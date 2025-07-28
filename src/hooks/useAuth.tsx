@@ -154,54 +154,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
         if (otp === mockUser.otp) {
           try {
-            // Use Supabase's admin functions to create a proper session
-            // First, let's try to sign in using the email we created
+            // First, try to sign in with the real Supabase user we created
+            console.log('Attempting to sign in mock user with email:', mockUser.email);
+            
             const { data, error } = await supabase.auth.signInWithPassword({
               email: mockUser.email,
               password: 'mockpassword123'
             });
             
+            console.log('Sign in result:', { data, error });
+            
             if (error) {
-              console.error('Sign in error:', error);
-              // If direct login fails, create a token-based session
-              // This is a fallback that creates a mock session that works with our app
-              const mockSession = {
-                access_token: `mock_token_${mockUser.userId}`,
-                refresh_token: `mock_refresh_${mockUser.userId}`,
-                expires_in: 3600,
-                expires_at: Math.floor(Date.now() / 1000) + 3600,
-                token_type: 'bearer',
-                user: {
-                  id: mockUser.userId,
-                  aud: 'authenticated',
-                  role: 'authenticated',
-                  email: mockUser.email,
-                  phone: phone,
-                  app_metadata: {
-                    provider: 'email',
-                    providers: ['email']
-                  },
-                  user_metadata: { 
-                    role: mockUser.role,
-                    display_name: mockUser.displayName
-                  },
-                  identities: [],
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                }
-              };
-              
-              setSession(mockSession as any);
-              setUser(mockSession.user as any);
+              console.error('Failed to sign in mock user:', error);
+              toast({
+                title: "Authentication Error",
+                description: `Mock user sign-in failed: ${error.message}`,
+                variant: "destructive",
+              });
+              return { error };
             }
             
-            toast({
-              title: "Welcome!",
-              description: `Logged in as ${mockUser.role} (mock).`,
-            });
+            if (data.user) {
+              console.log('Successfully authenticated mock user:', data.user.id);
+              toast({
+                title: "Welcome!",
+                description: `Logged in as ${mockUser.role} (authenticated).`,
+              });
+              return { error: null };
+            }
             
-            return { error: null };
-          } catch (authError) {
+          } catch (authError: any) {
             console.error('Authentication error:', authError);
             toast({
               title: "Authentication Error",
