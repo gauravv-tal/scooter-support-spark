@@ -132,18 +132,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const verifyOtp = async (phone: string, otp: string) => {
     try {
-      // Mock authentication for test numbers with fixed UUIDs
+      // Mock authentication for test numbers with actual database UUIDs
       const mockCredentials = {
         '+918888855555': { 
           otp: '346555', 
           role: 'admin',
-          userId: '00000000-0000-0000-0000-000000000001',
+          userId: '5a19298f-4737-4335-b7a9-57f36fed3f53',
           displayName: 'Mock Admin User'
         },
         '+918888844444': { 
           otp: '346444', 
           role: 'customer',
-          userId: '00000000-0000-0000-0000-000000000002',
+          userId: 'd66413b6-b6c1-413a-9000-abb5520a8f17',
           displayName: 'Mock Customer User'
         }
       };
