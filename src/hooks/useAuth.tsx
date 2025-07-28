@@ -176,6 +176,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             
             if (data.user) {
               console.log('Successfully authenticated mock user:', data.user.id);
+              
+              // Generate demo orders for mock customer
+              if (mockUser.role === 'customer') {
+                try {
+                  const { generateDemoOrders } = await import('@/utils/demoOrders');
+                  await generateDemoOrders(data.user.id);
+                  console.log('Demo orders generated for mock customer');
+                } catch (orderError) {
+                  console.error('Error generating demo orders:', orderError);
+                }
+              }
+              
               toast({
                 title: "Welcome!",
                 description: `Logged in as ${mockUser.role} (authenticated).`,
