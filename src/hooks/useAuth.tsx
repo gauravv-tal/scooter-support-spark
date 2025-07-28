@@ -58,6 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               .upsert({
                 user_id: session.user.id,
                 phone_number: session.user.phone,
+                role: session.user.user_metadata?.role || 'customer',
               }, {
                 onConflict: 'user_id'
               });
