@@ -20,21 +20,32 @@ const Header = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user) {
+        console.log('Header: Current user:', user);
+        console.log('Header: User ID:', user.id);
+        console.log('Header: User metadata:', user.user_metadata);
+        
         // For mock users (check by actual database UUIDs), get role from user metadata
         const mockUserIds = ['5a19298f-4737-4335-b7a9-57f36fed3f53', 'd66413b6-b6c1-413a-9000-abb5520a8f17'];
         if (mockUserIds.includes(user.id)) {
-          setUserRole(user.user_metadata?.role || 'customer');
+          const role = user.user_metadata?.role || 'customer';
+          console.log('Header: Mock user detected, role from metadata:', role);
+          setUserRole(role);
           return;
         }
 
         // For real users, get role from database profile
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from("profiles")
           .select("role")
           .eq("user_id", user.id)
           .single();
         
-        setUserRole(profile?.role || 'customer');
+        console.log('Header: Profile query result:', profile, error);
+        const role = profile?.role || 'customer';
+        console.log('Header: Setting role to:', role);
+        setUserRole(role);
+      } else {
+        console.log('Header: No user found');
       }
     };
 

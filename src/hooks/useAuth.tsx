@@ -154,7 +154,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (mockCredentials[phone as keyof typeof mockCredentials]) {
         const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
         if (otp === mockUser.otp) {
-          // Create a mock session with fixed UUID
+          // Create a mock session with actual database UUID
           const mockSession = {
             user: {
               id: mockUser.userId,
@@ -166,6 +166,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               }
             }
           };
+          
+          console.log('Mock session created:', mockSession);
+          console.log('Mock user role:', mockUser.role);
           
           setSession(mockSession as any);
           setUser(mockSession.user as any);
