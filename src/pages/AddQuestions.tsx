@@ -101,7 +101,11 @@ const AddQuestions = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
+      console.log('Adding question - User:', user);
+      console.log('Adding question - User ID:', user?.id);
+      console.log('Question data:', { question: newQuestion.question, answer: newQuestion.answer, category: newQuestion.category });
+      
+      const { data, error } = await supabase
         .from("predefined_questions")
         .insert({
           question: newQuestion.question,
@@ -109,6 +113,9 @@ const AddQuestions = () => {
           category: newQuestion.category || null,
           is_active: true
         });
+
+      console.log('Insert result - Data:', data);
+      console.log('Insert result - Error:', error);
 
       if (error) throw error;
 
