@@ -90,11 +90,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signInWithPhone = async (phone: string) => {
     try {
       // Mock authentication for test numbers
-      const mockNumbers = ['1234567890', '0987654321'];
+      const mockNumbers = ['918888855555', '918888844444'];
       if (mockNumbers.includes(phone)) {
         toast({
           title: "OTP Sent (Mock)",
-          description: "Use OTP 3465 for admin (1234567890) or 3466 for customer (0987654321).",
+          description: "Use OTP 3465 for admin (918888855555) or 3464 for customer (918888844444).",
         });
         return { error: null };
       }
@@ -129,8 +129,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       // Mock authentication for test numbers
       const mockCredentials = {
-        '1234567890': { otp: '3465', role: 'admin' },
-        '0987654321': { otp: '3466', role: 'customer' }
+        '918888855555': { otp: '3465', role: 'admin' },
+        '918888844444': { otp: '3464', role: 'customer' }
       };
       
       if (mockCredentials[phone as keyof typeof mockCredentials]) {
@@ -158,7 +158,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } else {
           toast({
             title: "Verification Failed",
-            description: "Invalid OTP. Use 3465 for admin or 3466 for customer.",
+            description: "Invalid OTP. Use 3465 for admin or 3464 for customer.",
             variant: "destructive",
           });
           return { error: { message: "Invalid OTP" } };
