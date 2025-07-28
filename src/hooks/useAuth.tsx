@@ -133,6 +133,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         '918888844444': { otp: '346444', role: 'customer' }
       };
       
+      console.log('Phone number received:', phone, 'OTP received:', otp);
+      console.log('Available mock credentials:', Object.keys(mockCredentials));
+      
       if (mockCredentials[phone as keyof typeof mockCredentials]) {
         const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
         if (otp === mockUser.otp) {
