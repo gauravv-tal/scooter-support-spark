@@ -52,19 +52,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
             const isNewUser = !existingProfile;
 
-            // Create or update user profile
-            const { error } = await supabase
-              .from('profiles')
-              .upsert({
-                user_id: session.user.id,
-                phone_number: session.user.phone,
-                role: session.user.user_metadata?.role || 'customer',
-              }, {
-                onConflict: 'user_id'
-              });
-            
-            if (error) {
-              console.error('Error updating profile:', error);
+            // Create profile only for new users
+            if (isNewUser) {
+              const { error } = await supabase
+                .from('profiles')
+                .insert({
+                  user_id: session.user.id,
+                  phone_number: session.user.phone,
+                  role: session.user.user_metadata?.role || 'customer',
+                });
+              
+              if (error) {
+                console.error('Error creating profile:', error);
+              }
             }
 
             // Generate demo orders for new users
