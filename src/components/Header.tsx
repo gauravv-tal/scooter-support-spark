@@ -79,9 +79,13 @@ const Header = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => navigate('/dashboard')}>Dashboard</DropdownMenuItem>
-          {userRole === 'admin' && (
-            <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
-          )}
+          {(() => {
+            console.log('Header render: userRole is:', userRole, typeof userRole);
+            console.log('Header render: userRole === "admin":', userRole === 'admin');
+            return userRole === 'admin' && (
+              <DropdownMenuItem onClick={() => navigate('/add-questions')}>Add Questions</DropdownMenuItem>
+            );
+          })()}
           <DropdownMenuItem onClick={() => navigate('/support-queries')}>Support Queries</DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate('/chat-history')}>Chat History</DropdownMenuItem>
           <DropdownMenuSeparator />
