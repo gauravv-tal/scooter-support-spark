@@ -41,8 +41,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_IN' && session?.user) {
-          // Skip profile creation for mock users
-          if (session.user.id.startsWith('mock-')) {
+          // Skip profile creation for mock users (check by specific UUIDs)
+          const mockUserIds = ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'];
+          if (mockUserIds.includes(session.user.id)) {
             return;
           }
           
@@ -131,10 +132,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const verifyOtp = async (phone: string, otp: string) => {
     try {
-      // Mock authentication for test numbers
+      // Mock authentication for test numbers with fixed UUIDs
       const mockCredentials = {
-        '+918888855555': { otp: '346555', role: 'admin' },
-        '+918888844444': { otp: '346444', role: 'customer' }
+        '+918888855555': { 
+          otp: '346555', 
+          role: 'admin',
+          userId: '00000000-0000-0000-0000-000000000001',
+          displayName: 'Mock Admin User'
+        },
+        '+918888844444': { 
+          otp: '346444', 
+          role: 'customer',
+          userId: '00000000-0000-0000-0000-000000000002',
+          displayName: 'Mock Customer User'
+        }
       };
       
       console.log('Phone number received:', phone, 'OTP received:', otp);
@@ -143,13 +154,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (mockCredentials[phone as keyof typeof mockCredentials]) {
         const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
         if (otp === mockUser.otp) {
-          // Create a mock session for testing
+          // Create a mock session with fixed UUID
           const mockSession = {
             user: {
-              id: `mock-${mockUser.role}-${Date.now()}`,
+              id: mockUser.userId,
               phone: phone,
               email: `${mockUser.role}@test.com`,
-              user_metadata: { role: mockUser.role }
+              user_metadata: { 
+                role: mockUser.role,
+                display_name: mockUser.displayName
+              }
             }
           };
           

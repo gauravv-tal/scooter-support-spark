@@ -20,8 +20,9 @@ const Header = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user) {
-        // For mock users, get role from user metadata
-        if (user.id.startsWith('mock-')) {
+        // For mock users (check by specific UUIDs), get role from user metadata
+        const mockUserIds = ['00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'];
+        if (mockUserIds.includes(user.id)) {
           setUserRole(user.user_metadata?.role || 'customer');
           return;
         }
