@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signInWithPhone = async (phone: string) => {
     try {
       // Mock authentication for test numbers
-      const mockNumbers = ['918888855555', '918888844444'];
+      const mockNumbers = ['+918888855555', '+918888844444'];
       if (mockNumbers.includes(phone)) {
         toast({
           title: "OTP Sent (Mock)",
@@ -129,8 +129,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       // Mock authentication for test numbers
       const mockCredentials = {
-        '918888855555': { otp: '346555', role: 'admin' },
-        '918888844444': { otp: '346444', role: 'customer' }
+        '+918888855555': { otp: '346555', role: 'admin' },
+        '+918888844444': { otp: '346444', role: 'customer' }
       };
       
       console.log('Phone number received:', phone, 'OTP received:', otp);
