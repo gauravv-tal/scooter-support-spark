@@ -41,6 +41,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_IN' && session?.user) {
+          // Skip profile creation for mock users
+          if (session.user.id.startsWith('mock-')) {
+            return;
+          }
+          
           // Create or update user profile and generate demo orders
           setTimeout(async () => {
             // Check if this is a new user by looking for existing profile
