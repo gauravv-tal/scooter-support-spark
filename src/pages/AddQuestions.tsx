@@ -101,6 +101,17 @@ const AddQuestions = () => {
     setIsSubmitting(true);
 
     try {
+      // For mock users, don't try to interact with the database
+      const mockUserIds = ['5a19298f-4737-4335-b7a9-57f36fed3f53', 'd66413b6-b6c1-413a-9000-abb5520a8f17'];
+      if (user && mockUserIds.includes(user.id)) {
+        toast({
+          title: "Success (Mock)",
+          description: "Question would be added successfully (mock user - database operations disabled)"
+        });
+        setNewQuestion({ question: "", answer: "", category: "" });
+        return;
+      }
+
       const { error } = await supabase
         .from("predefined_questions")
         .insert({
