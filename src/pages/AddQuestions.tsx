@@ -42,13 +42,26 @@ const AddQuestions = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
+        let role = 'customer';
         
-        if (profile?.role !== "admin") {
+        // For mock users (check by actual database UUIDs), get role from user metadata
+        const mockUserIds = ['5a19298f-4737-4335-b7a9-57f36fed3f53', 'd66413b6-b6c1-413a-9000-abb5520a8f17'];
+        if (mockUserIds.includes(user.id)) {
+          role = user.user_metadata?.role || 'customer';
+          console.log('AddQuestions: Mock user detected, role from metadata:', role);
+        } else {
+          // For real users, get role from database profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("user_id", user.id)
+            .single();
+          
+          role = profile?.role || 'customer';
+          console.log('AddQuestions: Real user, role from database:', role);
+        }
+        
+        if (role !== "admin") {
           toast({
             title: "Access Denied",
             description: "You need admin privileges to access this page.",
@@ -58,7 +71,7 @@ const AddQuestions = () => {
           return;
         }
         
-        setUserRole(profile.role);
+        setUserRole(role);
         loadQuestions();
       }
     };
