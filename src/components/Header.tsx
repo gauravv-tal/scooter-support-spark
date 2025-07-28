@@ -20,6 +20,13 @@ const Header = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user) {
+        // For mock users, get role from user metadata
+        if (user.id.startsWith('mock-')) {
+          setUserRole(user.user_metadata?.role || 'customer');
+          return;
+        }
+
+        // For real users, get role from database profile
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
