@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
             const isNewUser = !existingProfile;
 
-            // Create profile only for new users
+            // Only create profile and generate demo orders for truly new users
             if (isNewUser) {
               const { error } = await supabase
                 .from('profiles')
@@ -70,10 +70,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               if (error) {
                 console.error('Error creating profile:', error);
               }
-            }
 
-            // Generate demo orders for new users
-            if (isNewUser) {
+              // Generate demo orders only for new users
               await generateDemoOrders(session.user.id);
             }
           }, 0);
