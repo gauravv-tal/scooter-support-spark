@@ -89,6 +89,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signInWithPhone = async (phone: string) => {
     try {
+      // Mock authentication for test numbers
+      const mockNumbers = ['1234567890', '0987654321'];
+      if (mockNumbers.includes(phone)) {
+        toast({
+          title: "OTP Sent (Mock)",
+          description: "Use OTP 3465 for admin (1234567890) or 3466 for customer (0987654321).",
+        });
+        return { error: null };
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         phone,
         options: {
@@ -117,6 +127,44 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const verifyOtp = async (phone: string, otp: string) => {
     try {
+      // Mock authentication for test numbers
+      const mockCredentials = {
+        '1234567890': { otp: '3465', role: 'admin' },
+        '0987654321': { otp: '3466', role: 'customer' }
+      };
+      
+      if (mockCredentials[phone as keyof typeof mockCredentials]) {
+        const mockUser = mockCredentials[phone as keyof typeof mockCredentials];
+        if (otp === mockUser.otp) {
+          // Create a mock session for testing
+          const mockSession = {
+            user: {
+              id: `mock-${mockUser.role}-${Date.now()}`,
+              phone: phone,
+              email: `${mockUser.role}@test.com`,
+              user_metadata: { role: mockUser.role }
+            }
+          };
+          
+          setSession(mockSession as any);
+          setUser(mockSession.user as any);
+          
+          toast({
+            title: "Welcome!",
+            description: `Logged in as ${mockUser.role} (mock).`,
+          });
+          
+          return { error: null };
+        } else {
+          toast({
+            title: "Verification Failed",
+            description: "Invalid OTP. Use 3465 for admin or 3466 for customer.",
+            variant: "destructive",
+          });
+          return { error: { message: "Invalid OTP" } };
+        }
+      }
+
       const { error } = await supabase.auth.verifyOtp({
         phone,
         token: otp,
